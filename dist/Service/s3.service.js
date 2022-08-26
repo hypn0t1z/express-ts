@@ -21,7 +21,8 @@ const s3 = new aws_sdk_1.default.S3({
     signatureVersion: 'v4',
     region: process.env.S3_REGION
 });
-const { S3_BUCKET, S3_ENDPOINT } = process.env;
+const { S3_BUCKET } = process.env;
+const S3_ENDPOINT = `https://${S3_BUCKET}.s3.ap-southeast-1.amazonaws.com`;
 const S3_FOLDER = 'file';
 class S3Service {
     /**
@@ -38,9 +39,9 @@ class S3Service {
             return new Promise((resolve) => {
                 if (!fileName) {
                     return resolve({
-                        message: 'SIGNED_URL_FAILED',
-                        code: 'file',
-                        error: 'FILE_NAME_NOT_FOUND'
+                        message: 'FILE_NAME_NOT_FOUND',
+                        code: 'SIGNED_URL_FAILED',
+                        name: 'getSignedUrl'
                     });
                 }
                 const type = fileName.split(".").pop();
@@ -56,9 +57,9 @@ class S3Service {
                 s3.getSignedUrl('putObject', params, (err, data) => {
                     if (err)
                         return resolve({
-                            message: 'SIGNED_URL_FAILED',
-                            code: 'file',
-                            error: err
+                            message: err,
+                            code: 'SIGNED_URL_FAILED',
+                            name: 'getSignedUrl'
                         });
                     return resolve({
                         urlUpload: data,

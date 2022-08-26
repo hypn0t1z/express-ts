@@ -10,7 +10,6 @@ class UserController {
       const user = await UserService.findUserByEmail(email);
 
       return res.status(200).json({
-        success: true,
         data: user,
       });
     } catch (e) {

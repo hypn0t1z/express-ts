@@ -9,12 +9,12 @@ dotenv.config({});
 import { RouteConfig } from "./Router";
 import { UserRoutes } from "./Router/user.route";
 import { AuthRoutes } from "./Router/auth.route";
+import { IUser } from "./Model/User/user.interface";
+import { S3Routes } from "./Router/s3.route";
+import { FormError, HttpError, isSystemError } from "./Config/error";
 
 const app: Express = express();
 const routes: Array<RouteConfig> = [];
-
-import { IUser } from "./Model/User/user.interface";
-import { S3Routes } from "./Router/s3.route";
 
 declare global {
   namespace Express {
@@ -27,7 +27,6 @@ declare global {
 app.use(express.json());
 app.use(cors());
 app.use(express.static("public"));
-
 app.use(
     "/docs",
     swaggerUi.serve,
@@ -43,6 +42,20 @@ const PORT = process.env.PORT || 3001;
 routes.push(new UserRoutes(app));
 routes.push(new AuthRoutes(app));
 routes.push(new S3Routes(app));
+
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    if (err instanceof FormError) {
+        res.status(err.code)
+            .json(err.errors);
+    } else if (err instanceof HttpError) {
+        res.status(err.code)
+            .json({error: err.message});
+    } else if (!isSystemError(err)) {
+        res.statusMessage = err.message;
+        res.status(500)
+            .json({error: err.message});
+    }
+});
 
 const server: http.Server = http.createServer(app);
 

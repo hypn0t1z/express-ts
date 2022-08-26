@@ -6,13 +6,7 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {},
-        "securitySchemes": {
-          cookieAuth: {
-            type: 'apiKey',
-            in: 'cookie',
-            name: 'connect.sid'
-          }
-        }
+		"securitySchemes": {}
 	},
 	"info": {
 		"title": "express-typescript-test",

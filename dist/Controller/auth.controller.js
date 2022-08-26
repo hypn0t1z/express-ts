@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const auth_service_1 = __importDefault(require("../Service/auth.service"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const password_1 = require("../Service/Common/password");
+const error_1 = require("../Config/error");
 const jwtSecret = process.env.JWT_SECRET || "123456";
 const tokenExpirationInSeconds = 36000;
 class AuthController {
@@ -34,22 +35,20 @@ class AuthController {
                 if (user) {
                     const isPasswordMatch = yield password_1.Password.compare(user.password, password);
                     if (!isPasswordMatch) {
-                        throw new Error("Invalid Password");
+                        throw (0, error_1.badRequest)('login', error_1.FIELD_ERROR.INVALID, 'Invalid Password');
                     }
                     else {
                         const token = jsonwebtoken_1.default.sign(req.body, jwtSecret, {
                             expiresIn: tokenExpirationInSeconds,
                         });
                         return res.status(200).json({
-                            success: true,
                             data: Object.assign(Object.assign({}, user.toJSON()), { password: undefined }),
                             token,
                         });
                     }
                 }
                 else {
-                    console.log("User Not Found");
-                    throw new Error("User Not Found");
+                    throw (0, error_1.badRequest)('login', error_1.FIELD_ERROR.USER_NOT_FOUND, 'User Not Found');
                 }
             }
             catch (e) {
@@ -68,9 +67,12 @@ class AuthController {
             try {
                 const email = req.body.email;
                 const password = req.body.password;
+                if (!email || !password) {
+                    throw (0, error_1.badRequest)('register', error_1.FIELD_ERROR.INVALID, 'Email or password is required!');
+                }
                 const user = yield auth_service_1.default.findUserByEmail(email);
                 if (user) {
-                    throw new Error("User Already Exists");
+                    throw (0, error_1.badRequest)('register', error_1.FIELD_ERROR.EXISTED, 'User Already Exists');
                 }
                 else {
                     try {
@@ -79,15 +81,14 @@ class AuthController {
                         const token = jsonwebtoken_1.default.sign({ email, password }, jwtSecret, {
                             expiresIn: tokenExpirationInSeconds,
                         });
-                        return res.status(200).json({
-                            success: true,
+                        return res.status(201).json({
                             data: newUser,
                             token,
                         });
                     }
                     catch (e) {
                         console.log("Controller capturing error", e);
-                        throw new Error("Error while register");
+                        throw (0, error_1.badRequest)('register', error_1.FIELD_ERROR.INVALID, 'Error when register');
                     }
                 }
             }

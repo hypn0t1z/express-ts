@@ -34,9 +34,10 @@ const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 dotenv_1.default.config({});
 const user_route_1 = require("./Router/user.route");
 const auth_route_1 = require("./Router/auth.route");
+const s3_route_1 = require("./Router/s3.route");
+const error_1 = require("./Config/error");
 const app = (0, express_1.default)();
 const routes = [];
-const s3_route_1 = require("./Router/s3.route");
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use(express_1.default.static("public"));
@@ -49,6 +50,21 @@ const PORT = process.env.PORT || 3001;
 routes.push(new user_route_1.UserRoutes(app));
 routes.push(new auth_route_1.AuthRoutes(app));
 routes.push(new s3_route_1.S3Routes(app));
+app.use((err, req, res, next) => {
+    if (err instanceof error_1.FormError) {
+        res.status(err.code)
+            .json(err.errors);
+    }
+    else if (err instanceof error_1.HttpError) {
+        res.status(err.code)
+            .json({ error: err.message });
+    }
+    else if (!(0, error_1.isSystemError)(err)) {
+        res.statusMessage = err.message;
+        res.status(500)
+            .json({ error: err.message });
+    }
+});
 const server = http.createServer(app);
 server.listen(PORT, () => {
     console.log(`Server is running on ${PORT}`);

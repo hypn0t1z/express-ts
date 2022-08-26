@@ -24,7 +24,7 @@ class JWT {
             });
         }
         else {
-            res.status(403).json({ success: false, message: "UnAuthorized" });
+            res.status(401).json({ success: false, message: "UnAuthorized" });
         }
     }
 }

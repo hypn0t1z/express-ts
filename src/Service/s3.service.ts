@@ -27,9 +27,9 @@ class S3Service {
         return new Promise((resolve) => {
             if (!fileName) {
                 return resolve({
-                    message: 'SIGNED_URL_FAILED',
-                    code: 'file',
-                    error: 'FILE_NAME_NOT_FOUND'
+                    message: 'File name is required',
+                    code: 'FILE_NAME_NOT_FOUND',
+                    name: 'getSignedUrl'
                 });
             }
 
@@ -47,9 +47,9 @@ class S3Service {
             s3.getSignedUrl('putObject', params, (err, data) => {
                 if (err)
                     return resolve({
-                        message: 'SIGNED_URL_FAILED',
-                        code: 'file',
-                        error: err
+                        message: err,
+                        code: 'SIGNED_URL_FAILED',
+                        name: 'getSignedUrl'
                     });
 
                 return resolve({
