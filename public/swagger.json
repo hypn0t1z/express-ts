@@ -1,0 +1,32 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {},
+        "securitySchemes": {
+          cookieAuth: {
+            type: 'apiKey',
+            in: 'cookie',
+            name: 'connect.sid'
+          }
+        }
+	},
+	"info": {
+		"title": "express-typescript-test",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"openapi": "3.0.0",
+	"paths": {},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
